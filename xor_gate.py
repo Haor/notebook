@@ -14,6 +14,6 @@ if __name__ == '__main__':
         y = XOR(xs[0], xs[1])
         print(str(xs) + " -> " + str(y))
 
-# XOR gate是一个非线性的逻辑电路，因此无法用单层感知机来实现
+# 异或门XOR gate是一个非线性的逻辑电路，因此无法用单层感知机来实现
 # 但是可以用多层感知机来实现
 # Path: xor_gate2.py
