@@ -59,3 +59,67 @@ sigmoid函数和阶跃函数都是非线性函数，但是它们的输出值的�
 神经网络的激活函数**必须**使用非线性函数，换句话说，激活函数不能使用线性函数。  
 如果使用线性函数作为激活函数，那么神经网络就退化成了感知机，加深神经网络的层数就没有意义了。  
 线性函数的问题在于，不管如何加深层数，总是存在与之等价的单层神经网络。
+
+## 三层神经网络的实现
+### 乘积运算的实现
+乘积运算的实现可以使用numpy的dot函数，也可以使用for循环实现。  
+
+输出层所用的激活函数，要根据问题的性质来选择。一般来说，回归问题使用恒等函数，二分类问题使用sigmoid函数，多分类问题使用softmax函数。
+### 三层神经网络的实现
+```
+import numpy as np
+
+def init_network():
+    network = {}
+    network['W1'] = np.array([[0.1, 0.3, 0.5], [0.2, 0.4, 0.6]])
+    network['b1'] = np.array([0.1, 0.2, 0.3])
+    network['W2'] = np.array([[0.1, 0.4], [0.2, 0.5], [0.3, 0.6]])
+    network['b2'] = np.array([0.1, 0.2])
+    network['W3'] = np.array([[0.1, 0.3], [0.2, 0.4]])
+    network['b3'] = np.array([0.1, 0.2])
+
+    return network
+
+def forward(network, x):
+    W1, W2, W3 = network['W1'], network['W2'], network['W3']
+    b1, b2, b3 = network['b1'], network['b2'], network['b3']
+
+    a1 = np.dot(x, W1) + b1
+    z1 = sigmoid(a1)
+    a2 = np.dot(z1, W2) + b2
+    z2 = sigmoid(a2)
+    a3 = np.dot(z2, W3) + b3
+    y = identity_function(a3)
+
+    return y
+
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+def identity_function(x):
+    return x
+
+network = init_network()
+x = np.array([1.0, 0.5])
+y = forward(network, x)
+print(y)    # [ 0.31682708  0.69627909]
+```
+
+###恒等函数和softmax函数
+恒等函数会将输入信号原封不动地输出，而softmax函数会将输入信号转换为概率。
+```
+def softmax(a):
+    c = np.max(a)
+    exp_a = np.exp(a - c)   # 溢出对策，为了防止指数函数的值过大，导致计算机无法处理。
+    sum_exp_a = np.sum(exp_a)
+    y = exp_a / sum_exp_a
+
+    return y
+```
+
+softmax函数的输出是0.0到1.0的实数，且输出的总和为1。
+**并且输出值的总和为1。**
+这是softmax函数的重要特征，它表示了输出值的概率分布。正是因为这个性质，我们可以将softmax函数的输出解释为“**概率**”。
+输出值的大小反映了该神经元的重要性。
+`求解机器学习问题的步骤可以分为“学习”和“推理”两个阶段。推理阶段一般会省略softmax函数，因为softmax函数的输出是概率，而推理阶段只需要识别出概率最高的那个元素。`
+
